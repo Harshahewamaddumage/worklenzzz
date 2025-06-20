@@ -473,3 +473,4 @@ The Docker setup uses environment variables to configure the services:
 
 For custom configuration, edit the `.env` file or the `update-docker-env.sh` script.
 
+# Testing PR workflow
