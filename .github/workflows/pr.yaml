@@ -1,0 +1,40 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pr-checks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - name: frontend
+            context: ./worklenz-frontend
+          - name: backend
+            context: ./worklenz-backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ matrix.service.name }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Test Docker build for ${{ matrix.service.name }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          push: false
+          tags: test/${{ matrix.service.name }}:pr-check
+          load: false
